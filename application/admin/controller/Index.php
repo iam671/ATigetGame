@@ -12,10 +12,6 @@ class Index extends AdminBase
     ];
     protected $noAuth = [
         'index',
-        'uploadImage',
-        'uploadFile',
-        'uploadVideo',
-        'iconLibs',
         'logout'
     ];
 
@@ -85,69 +81,6 @@ class Index extends AdminBase
             'reset'    => true,
         ];
         return captcha('', $config);
-    }
-
-    public function uploadImage()
-    {
-        try {
-            $file = $this->request->file('file');
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'upload' . DS . 'image');
-            if ($info) {
-                $upload_image = unserialize(config('upload_image'));
-                if ($upload_image['is_thumb'] == 1 || $upload_image['is_water'] == 1 || $upload_image['is_text'] == 1) {
-                    $object_image = \think\Image::open($info->getPathName());
-                    // 图片压缩
-                    if ($upload_image['is_thumb'] == 1) {
-                        $object_image->thumb($upload_image['max_width'], $upload_image['max_height']);
-                    }
-                    // 图片水印
-                    if ($upload_image['is_water'] == 1) {
-                        $object_image->water(ROOT_PATH . str_replace('/', '\\', trim($upload_image['water_source'], '/')), $upload_image['water_locate'], $upload_image['water_alpha']);
-                    }
-                    // 文本水印
-                    if ($upload_image['is_text'] == 1) {
-                        $font = !empty($upload_image['text_font']) ? str_replace('/', '\\', trim($upload_image['text_font'], '/')) : 'vendor\topthink\think-captcha\assets\zhttfs\1.ttf';
-                        $object_image->text($upload_image['text'], ROOT_PATH . $font, $upload_image['text_size'], $upload_image['text_color'], $upload_image['text_locate'], $upload_image['text_offset'], $upload_image['text_angle']);
-                    }
-                    $object_image->save($info->getPathName());
-                }
-                return ['code' => 1, 'url' => '/upload/image/' . str_replace('\\', '/', $info->getSaveName())];
-            } else {
-                return ['code' => 0, 'msg' => $file->getError()];
-            }
-        } catch (\Exception $e) {
-            return ['code' => 0, 'msg' => $e->getMessage()];
-        }
-    }
-
-    public function uploadFile()
-    {
-        try {
-            $file = $this->request->file('file');
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'upload' . DS . 'file');
-            if ($info) {
-                return ['code' => 1, 'url' => '/upload/file/' . str_replace('\\', '/', $info->getSaveName())];
-            } else {
-                return ['code' => 0, 'msg' => $file->getError()];
-            }
-        } catch (\Exception $e) {
-            return ['code' => 0, 'msg' => $e->getMessage()];
-        }
-    }
-
-    public function uploadVideo()
-    {
-        try {
-            $file = $this->request->file('file');
-            $info = $file->move(ROOT_PATH . 'public' . DS . 'upload' . DS . 'video');
-            if ($info) {
-                return ['code' => 1, 'url' => '/upload/video/' . str_replace('\\', '/', $info->getSaveName())];
-            } else {
-                return ['code' => 0, 'msg' => $file->getError()];
-            }
-        } catch (\Exception $e) {
-            return ['code' => 0, 'msg' => $e->getMessage()];
-        }
     }
 
     public function iconLibs()
