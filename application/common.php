@@ -14,29 +14,55 @@ if (!function_exists('iphone')) {
 			return 'Unknown';
 		}
 
-		$patterns = [
-			'/iPhone[^;]*/i',
-			'/iPad[^;]*/i',
-			'/HarmonyOS[^;]*/i',
-			'/Android[^;)]*/i',
-			'/Windows Phone[^;)]*/i',
-			'/OPPO[^;)]*/i',
-			'/VIVO[^;)]*/i',
-			'/HUAWEI[^;)]*/i',
-			'/HONOR[^;)]*/i',
-			'/Xiaomi[^;)]*/i',
-			'/Redmi[^;)]*/i',
-			'/SM-[A-Z0-9-]+/i',
-			'/Pixel [^;)]*/i',
-		];
-
-		foreach ($patterns as $pattern) {
-			if (preg_match($pattern, $userAgent, $matches)) {
-				return trim($matches[0]);
-			}
+		if (preg_match('/iPhone|iPad|iPod/i', $userAgent)) {
+			return 'IPhone';
 		}
 
-		return substr($userAgent, 0, 120);
+		if (preg_match('/HUAWEI|HONOR/i', $userAgent)) {
+			return '华为';
+		}
+
+		if (preg_match('/Windows NT|Macintosh|X11|Linux x86_64/i', $userAgent)) {
+			return 'PC浏览器';
+		}
+
+		if (preg_match('/OPPO/i', $userAgent)) {
+			return 'OPPO';
+		}
+
+		if (preg_match('/VIVO/i', $userAgent)) {
+			return 'VIVO';
+		}
+
+		if (preg_match('/Xiaomi/i', $userAgent)) {
+			return 'Xiaomi';
+		}
+
+		if (preg_match('/Redmi/i', $userAgent)) {
+			return 'Redmi';
+		}
+
+		if (preg_match('/SM-[A-Z0-9-]+/i', $userAgent)) {
+			return 'Samsung';
+		}
+
+		if (preg_match('/Pixel/i', $userAgent)) {
+			return 'Pixel';
+		}
+
+		if (preg_match('/HarmonyOS/i', $userAgent)) {
+			return 'HarmonyOS';
+		}
+
+		if (preg_match('/Windows Phone/i', $userAgent)) {
+			return 'Windows Phone';
+		}
+
+		if (preg_match('/Android/i', $userAgent)) {
+			return 'Android';
+		}
+
+		return substr($userAgent, 0, 20);
 	}
 }
 
@@ -225,6 +251,67 @@ if (!function_exists('timediff')) {
 		}
 
 		return date('Y-m-d H:i:s', $timestamp);
+	}
+}
+
+if (!function_exists('hashids_instance')) {
+	function hashids_instance()
+	{
+		static $hashids;
+
+		if ($hashids === null) {
+			$salt = config('database.prefix') . '|' . config('administrator') . '|config';
+			$hashids = new \Hashids\Hashids($salt, 6);
+		}
+
+		return $hashids;
+	}
+}
+
+if (!function_exists('hashids_encode')) {
+	function hashids_encode($value)
+	{
+		if (!is_numeric($value)) {
+			return (string) $value;
+		}
+
+		return hashids_instance()->encode((int) $value);
+	}
+}
+
+if (!function_exists('hashids_decode')) {
+	function hashids_decode($value)
+	{
+		if (is_numeric($value)) {
+			return (int) $value;
+		}
+
+		$decoded = hashids_instance()->decode((string) $value);
+		if (empty($decoded)) {
+			return 0;
+		}
+
+		return (int) $decoded[0];
+	}
+}
+
+if (!function_exists('format_bytes')) {
+	function format_bytes($size, $decimals = 2)
+	{
+		$size = max((float) $size, 0);
+		$units = ['B', 'KB', 'MB', 'GB', 'TB'];
+		$index = 0;
+
+		while ($size >= 1024 && $index < count($units) - 1) {
+			$size /= 1024;
+			$index++;
+		}
+
+		if ($index === 0) {
+			return (int) $size . ' ' . $units[$index];
+		}
+
+		return round($size, (int) $decimals) . ' ' . $units[$index];
 	}
 }
 

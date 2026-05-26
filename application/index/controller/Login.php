@@ -32,9 +32,8 @@ public function login() {
                     // 将用户信息保存到ThinkPHP的会话中
                     session('user_info', $user_info);
 
-                    // 将用户ID单独保存到原生PHP会话中
-                    session_start();
-                    $_SESSION['user_id'] = $user_info['id'];
+                    // 复用 ThinkPHP 会话，避免重复调用原生 session_start()
+                    session('user_id', $user_info['id']);
 
                     // 将用户ID保存到Cookie中，有效期为7天
                     setcookie('user_id', $user_info['id'], time() + 7 * 24 * 60 * 60, '/');
@@ -135,90 +134,78 @@ public function modify(){
     //         return $this->success("获取用户信息成功！",'',$user_info);
     //     }
     // }
-    
-    
-    
-    
-    
-    
-    
-     // 注册
-public function register(){
-    if($this->request->isPost()){
-        $param  = $this->request->param();
-        $config = db("config")->where('name','money')->find();
-        
-        // 构建用户数据
-        $data = array([
-            'username' => $param['username'],   // 用户名
-            'password' => md5($param['password']),   // 密码
-            'secret_security' => "你的QQ号码是多少?",  // 密保问题
-            'mobile' => iphone(),  // 获取手机型号
-            'answer' => $param['answer'],  // 密保问题答案
-            'create_time' => time(),  // 注册时间
-            'balance' => $config['value'],  // 初始余额
-            'pid' => $param['pid'],
-            'register_ip' => $this->phone_ip(),  // 注册IP
-        ]);
-        
-        $zen = db("config")->where("name",'site_copyright')->find();
-        
-        if ($param['pid'] != 0) {
-            db("user")->where("id", $param['pid'])->setInc("balance", $zen['value']);
-        }
 
-        // 检查是否已经注册
-        $select = db("user")->where('register_ip', $this->phone_ip())->select();
-        $username = db("user")->where("username", $param['username'])->find();
+    // 注册
+    public function register(){
+        if($this->request->isPost()){
+            $param  = $this->request->param();
+            $config = db("config")->where('name','money')->find();
+            
+            // 构建用户数据
+            $data = array([
+                'username' => $param['username'],   // 用户名
+                'password' => md5($param['password']),   // 密码
+                'secret_security' => "你的微信是多少?",  // 密保问题
+                'mobile' => iphone(),  // 获取手机型号
+                'answer' => $param['answer'],  // 密保问题答案
+                'create_time' => time(),  // 注册时间
+                'balance' => $config['value'],  // 初始余额
+                'pid' => $param['pid'],
+                'register_ip' => $this->phone_ip(),  // 注册IP
+            ]);
+            
+            $zen = db("config")->where("name",'site_copyright')->find();
+            
+            if ($param['pid'] != 0) {
+                db("user")->where("id", $param['pid'])->setInc("balance", $zen['value']);
+            }
 
-        if (empty($username)) {
-            if (empty($select)) {
-                if (db("user")->insertAll($data)) {
-                    user_log("注册");
-                    $userId = db('user')->getLastInsID();
-                    distribution(0, $userId);
-                    
-                    // 注册成功后请求头像接口
-                    $this->requestAvatar($param['answer']);  // 传递QQ号码进行头像请求
-                    
-                    $this->success('注册成功', '', 'true');
+            // 检查是否已经注册
+            $select = db("user")->where('register_ip', $this->phone_ip())->select();
+            $username = db("user")->where("username", $param['username'])->find();
+
+            if (empty($username)) {
+                if (empty($select)) {
+                    if (db("user")->insertAll($data)) {
+                        user_log("注册");
+                        $userId = db('user')->getLastInsID();
+                        distribution(0, $userId);
+                        
+                        // 注册成功后请求头像接口
+                        // $this->requestAvatar($param['answer']);  // 传递QQ号码进行头像请求
+                        
+                        $this->success('注册成功', '', 'true');
+                    }
+                } else {
+                    $this->error("该设备已经注册过账号！", '', 'false');
                 }
             } else {
-                $this->error("该设备已经注册过账号！", '', 'false');
+                return $this->error("账号已经存在！", '', 'false');
             }
-        } else {
-            return $this->error("账号已经存在！", '', 'false');
         }
     }
-}
 
-
-
-// 请求头像接口
-private function requestAvatar($qq) {
-    // 获取当前域名和协议
-    $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://');
-    $domain = $_SERVER['HTTP_HOST'];
-    
-    // 构建API请求URL
-    $apiUrl = $scheme . $domain . '/qq/qq.php?qq=' . $qq;
-    
-    // 初始化curl会话
-    $ch = curl_init();
-    // 设置curl选项
-    curl_setopt($ch, CURLOPT_URL, $apiUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    // 执行curl会话
-    curl_exec($ch);
-    
-    // 关闭curl会话
-    curl_close($ch);
-}
-
-    
-    
-    
+    // 请求头像接口
+    private function requestAvatar($qq) {
+        // 获取当前域名和协议
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://');
+        $domain = $_SERVER['HTTP_HOST'];
+        
+        // 构建API请求URL
+        $apiUrl = $scheme . $domain . '/qq/qq.php?qq=' . $qq;
+        
+        // 初始化curl会话
+        $ch = curl_init();
+        // 设置curl选项
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        // 执行curl会话
+        curl_exec($ch);
+        
+        // 关闭curl会话
+        curl_close($ch);
+    }
     
     public function user_pwd(){
         if($this->request->isPost()) {
