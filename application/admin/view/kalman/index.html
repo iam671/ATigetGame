@@ -1,0 +1,81 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-header">
+        <form action="{:url('admin/kalman/index')}" class="layui-form" method="get">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input type="text" name="user_id" value="" autocomplete="off" placeholder="请输入使用卡密用户ID" class="layui-input"/>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" name="kalman_pwd" value="" autocomplete="off" placeholder="请输入卡密密码" class="layui-input"/>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="state">
+                        <option value="">使用状态</option>
+                        <option value="0">未使用</option>
+                        <option value="1">已使用</option>
+
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="generate_admin">
+                        <option value="">生成管理员</option>
+                        {foreach name="admin" item="v" empty="$empty"}
+                        <option value="{$v.id}">{$v.username}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 50px;">
+                    <button class="layui-btn layui-btn-primary ajax-search"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-btn-group">
+            <a href="{:url('admin/kalman/add', ['cid' => input('cid')])}" class="layui-btn"><i class="fa fa-plus-circle"></i> 添加数据</a>
+            <a href="{:url('admin/kalman/del')}" class="layui-btn layui-btn-danger ajax-batch"><i class="fa fa-trash-o"></i> 批量删除</a>
+        </div>
+        <table class="layui-table layui-form">
+            <thead>
+            <tr>
+                <th><input type="checkbox" lay-skin="primary" lay-filter="*"></th>
+                <th>ID</th>
+                <th>使用卡密用户ID</th>
+                <th>卡密金额</th>
+                <th>使用状态</th>
+                <th>生成时间</th>
+                <th>卡密代码</th>
+                <th>生成管理员</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach name="list" item="v" empty="$empty"}
+            <tr>
+                <td>
+                    <input type="checkbox" name="id" value="{$v.id}" lay-skin="primary">
+                </td>
+                <td>{$v.id}</td>
+                <td>{if $v.state eq 0}卡密未使用{else/}{$v.user_id}{/if}</td>
+                <td>{$v.number}</td>
+                <td>
+                    {if $v.state eq 0}<button type="button" class="layui-btn layui-btn-warm">未使用</button>
+                    {elseif $v.state eq 1}<button type="button" class="layui-btn layui-btn-danger">已使用</button>
+                    {/if}
+                </td>
+                <td>{$v.generation_time||date="Y-m-d H:i:s",###}</td>
+                <td>{$v.kalman_pwd}</td>
+                <td>{$v.username}</td>
+                <td>
+                    <a href="{:url('admin/kalman/del', ['id' => $v.id])}" class="layui-btn layui-btn-xs layui-btn-danger ajax-delete"><i class="fa fa-trash-o"></i> 删除</a>
+                </td>
+            </tr>
+            {/foreach}
+            </tbody>
+        </table>
+        <div class="page">{$list->render()}</div>
+    </div>
+</div>
+{/block}

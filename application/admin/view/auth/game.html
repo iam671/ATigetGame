@@ -1,0 +1,245 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <div class="layui-tab layui-tab-brief" lay-filter="group">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-id="website">水果设置</li>
+                <li lay-id="contact">玩法设置</li>
+                <li lay-id="size">控制总阀</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <form action="{:url('admin/auth/game_id')}" class="layui-form" method="post">
+                       
+                        <table class="layui-table layui-form">
+			            <thead>
+			            <tr>			              
+			                <th>ID</th>
+			                <th>水果名称</th>
+			                <th>水果概率</th>
+			                <th>水果倍率</th>			              
+			            </tr>
+			            </thead>
+			            <tbody>
+			            
+			             {foreach name="fruits" item="val"}
+			             {if $val['pid']==5}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+			            
+			             {foreach name="fruits" item="val"}
+			             {if $val['pid']==13}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==19}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==2}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+						{foreach name="fruits" item="val"}
+			             {if $val['pid']==8}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==20}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==16}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==4}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+
+			            {foreach name="fruits" item="val"}
+			             {if $val['pid']==10}
+			            <tr>			               
+			                <td>{$val.game_id}</td>
+			                <td>{$val.prize}</td>
+			                <td>
+			                	<input type="number" style="width:50%" oninput="change('{$val.game_id}')" data-type="game_v" id="{$val.game_id}" name="luck_{$val.game_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+			                </td>
+			                <td>
+							<input type="number" style="width:50%" name="luck_{$val.game_id}[multiple_rate]" value="{$val.multiple_rate}" placeholder="请输入中奖倍数" class="layui-input">
+						 </td>			             
+			            </tr>
+			            {/if}
+			            {/foreach}
+			            </tbody>
+			        </table>
+			        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-filter="*" lay-submit="">保存</button>
+                               
+                            </div>
+                        </div>
+			                                
+                    </form>
+                </div>
+                <div class="layui-tab-item ">
+                    <form action="{:url('admin/auth/luck_id')}" class="layui-form" method="post">
+                        {foreach name="luck" item="val"}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">{$val.luck_name}</label>
+                            <div class="layui-input-inline">
+                                <input type="number" data-type="luck_v" oninput="change('luck_{$val.luck_id}')" id="luck_{$val.luck_id}" name="luck_{$val.luck_id}[v]" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+                            </div>
+                        </div>
+                        {/foreach}
+                        {foreach name="size" item="val"}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">大小概率</label>
+                            <div class="layui-input-inline">
+                                <input type="number" oninput="change('size')" data-type="size" max="100" id="size" name="size" value="{$val.v}" placeholder="请输入中奖概率" class="layui-input">
+                            </div>
+                        </div>
+                        {/foreach}
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="layui-tab-item ">
+                    <form action="{:url('admin/auth/whole')}" class="layui-form" method="post">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">中奖概率</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="v" id="whole" data-type="whole" oninput="change('whole')" value="{$whole.v}" placeholder="请输入中奖概率1~100" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script>
+    var layid = location.hash.replace(/^#group=/, '');
+    element.tabChange('group', layid);
+    element.on('tab(group)', function (elem) {
+        location.hash = 'group=' + $(this).attr('lay-id');
+    });
+    function change(sid){
+        console.log(sid);
+        var a=document.getElementById(sid).value;
+        var data_type=$("#"+sid).attr("data-type");
+        console.log(data_type);
+        // if(a>100 || sum(data_type)>100){
+        //     alert("概率必须小于等于100");
+        //     document.getElementById(sid).value=0;
+        // }
+    }
+   function sum(data_type) {
+        var game_v=0;
+        $("input").each(function (res) {
+            if($(this).attr("data-type")==data_type){
+                //属于游戏的概率
+                game_v=parseInt(game_v)+parseInt($(this).val())
+            }
+        })
+        return game_v;
+    }
+
+</script>
+{/block}

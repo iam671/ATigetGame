@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title><?=$config['siteName']?>安装使用协议 - 在线安装系统</title>
+    <?php require_once ('step-base.html');?>
+</head>
+<body>
+<div class="layui-container">
+
+    <h1 class="install-h1">开始安装</h1>
+    <?php if(is_file($lockFile)):?>
+    <div class="layui-error">
+        当前已经安装本系统，如果需要重新安装，请手动移除/install.lock文件
+    </div>
+    <?php endif;?>
+    <blockquote class="layui-elem-quote">
+        <h1>安装协议</h1>
+        <p>感谢您使用【<?=$config['siteName']?>】</p>
+        <p>接受本协议才可以继续安装使用【<?=$config['siteName']?>】</p>
+        <p style="margin-top: 20px;font-size: 18px;">协议细则：</p>
+		<h4>I. 协议许可的权利</h4>
+		您可以在协议规定的约束和限制范围内修改<?=$config['siteName']?>源代码(如果被提供的话)或界面风格以适应您的网站要求。<br />
+		您拥有使用本源码构建的网站中全部会员资料、文章及相关信息的所有权，并独立承担与文章内容的相关法律义务。
+		</p>
+		<div class="hr_8"></div>
+		<h4>II. 有限担保和免责声明</h4>
+		本源码及所附带的文件是作为不提供任何明确的或隐含的赔偿或担保的形式提供的。用户出于自愿而使用本源码，您必须了解使用本源码的风险，在尚未购买产品技术服务之前，我们不承诺提供任何形式的技术支持、使用担保，也不承担任何因使用本源码而产生问题的相关责任。
+		</p>
+	</div>
+</div>
+    </blockquote>
+    <div class="btn-box">
+        <a class="layui-btn layui-btn-warm layui-btn-radius" href="javascript:;">拒绝</a>
+        <a class="layui-btn agree layui-btn-radius" data-href="./install.php?s=step2">同意</a>
+    </div>
+    <br>
+    <div class="layui-footer footer">
+        <h5>Powered by <font><?=$config['siteName']?></font><font class="orange"></font></h5>
+        <h6>版权所有 <?=date('Y')?> © <a href="/" target="_blank"><?=$config['siteName']?></a></h6>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    layui.use('layer',function(){
+        layer = layui.layer;$ = layui.$;
+        $(document).on("click",'.agree',function(){
+            _that = $(this);
+            if(msg){
+                layer.msg(msg)
+                return false;
+            }else{
+                window.location.href =  _that.data('href');
+            }
+        })
+    })
+</script>

@@ -1,0 +1,86 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+	<div class="layui-card-header">
+		<form action="{:url('admin/user/index')}" class="layui-form" method="get">
+			<div class="layui-form-item">
+				<div class="layui-input-inline">
+					<input type="text" name="id" value="" autocomplete="off" placeholder="请输入用户ID" class="layui-input"/>
+				</div>
+				<div class="layui-input-inline">
+					<input type="text" name="username" value="" autocomplete="off" placeholder="请输入用户账号" class="layui-input"/>
+				</div>
+				<div class="layui-input-inline">
+					<input type="text" name="last_login_ip" value="" autocomplete="off" placeholder="请输入IP" class="layui-input"/>
+				</div>
+				<div class="layui-input-inline">
+					<select name="status">
+						<option value="">状态</option>
+						<option value="0">禁用</option>
+						<option value="1">启用</option>
+
+					</select>
+				</div>
+				<div class="layui-input-inline">
+					<select name="on_line">
+						<option value="">用户在线状态</option>
+						<option value="0">在线</option>
+						<option value="1">离线</option>
+
+					</select>
+				</div>
+				<div class="layui-input-inline" style="width: 50px;">
+					<button class="layui-btn layui-btn-primary ajax-search"><i class="fa fa-search"></i></button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="layui-card-body">
+        <div class="layui-btn-group">
+		    <a href="{:url('admin/user/add')}" class="layui-btn"><i class="fa fa-plus-circle"></i> 添加会员</a>
+		    <a href="{:url('admin/user/export')}" class="layui-btn layui-btn-primary"><i class="fa fa-file-excel-o"></i> 导出会员</a>
+			<a class="layui-btn"><i class="fa fa-plus-circle"></i> 在线人数：{$on_line}</a>
+        </div>
+		<table class="layui-table layui-form">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>用户账号</th>
+					<th>手机号</th>
+					<th>上次登录时间</th>
+					<th>上次登录IP</th>
+					<th>账号注册IP</th>
+					<th>账户余额</th>
+					<th>卡密金额</th>
+					<th>用户在线状态</th>
+					<th>状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{foreach name="list" item="v" empty="$empty"}
+				<tr>
+					<td>{$v.id}</td>
+					<td>{$v.username}</td>
+					<td>{$v.mobile}</td>
+					<td>{if empty($v.last_login_time)}无{else/}{$v.last_login_time|date='Y-m-d H:i:s', ###}{/if}</td>
+					<td>{$v.last_login_ip|default='无'}</td>
+					<td>{$v.register_ip|default='无'}</td>
+					<td>{$v.balance}</td>
+					<td>{$v.kami}</td>
+					<td>{$v.update_time | timediff}</td>
+					<td>
+						<input type="checkbox" name="status" lay-skin="switch" lay-filter="*" lay-text="启用|禁用" data-url="{:url('admin/user/status', ['id' => $v.id])}" {if $v.status eq 1}checked="checked"{/if}>
+					</td>
+					<td>
+						<a href="{:url('admin/user/edit', ['id' => $v.id])}" class="layui-btn layui-btn-xs layui-btn-normal"><i class="fa fa-edit"></i> 编辑</a>
+						<a href="{:url('admin/user/del', ['id' => $v.id])}" class="layui-btn layui-btn-xs layui-btn-danger ajax-delete"><i class="fa fa-trash-o"></i> 删除</a>
+					</td>
+				</tr>
+				{/foreach}
+			</tbody>
+		</table>
+		<div class="page">{$list->render()}</div>
+	</div>
+</div>
+{/block}
