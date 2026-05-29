@@ -27,128 +27,148 @@ class Game extends Base
         );
         db("game_log")->insert($data);
     }
+
     public function get_gift(){
         //拼装奖项数组
         if($this->request->isPost()){
-            //拼装奖项数组
-            if($this->request->isPost()){
-                $param = $this->request->param();
-                $whole=array();
-                foreach ($param['fruits'] as $key=>$item){
-                    array_push($whole,$item[0]);
-                }
-                if(empty($param)){
-                    return $this->error("没有参数！请传递参数");
-                }
-                distribution($param['money']);
-                $prize_arr=db('game')->select();//查询水果中奖概率
-                $user_info=$this->user_in();
-                if($user_info['is_thumb']==1){
-                    $prize=Db::name("user_luck")->field('luck_sel')->where("user_id",$user_info['id'])->find();
-                    $ar['1']=100-$prize['luck_sel'];//未中
-                    $ar['2']=$prize['luck_sel'];//中
-                    $rid = $this->get_rand($ar);
-                    if($rid==1){
-                        foreach ($prize_arr as $key=>$item){
-                            if($item['game_id']==10||$item['game_id']==22){
-                                $prize_arr[$key]['v']=0;
-                            }
-                        }
-                    }else{
-                        foreach ($prize_arr as $key=>$item){
-                            if($item['game_id']==10||$item['game_id']==22){
-                                $prize_arr[$key]['v']=$prize['luck_sel']/2;
-                            }else{
-                                $prize_arr[$key]['v']=0;
-                            }
-                        }
-                    }
-                }//判断LUCK抽中概率
+            $param = $this->request->param();
+            $whole = array();
 
-                foreach ($prize_arr as $key=>$item){
-                    if(in_array($item['game_id'],$whole) || $item['game_id']==10 || $item['game_id']==22){
-                        $arr[$item['game_id']] = $item['v']*($this->whole());//概率数组
-                    }else{
-                        $arr[$item['game_id']] = $item['v']*(100-$this->whole());//概率数组
-                    }
-                }
-                if($this->whole()==100){
-                    foreach ($arr as $key=>$item){
-                        if($key==5){
-                            $arr[$key]=0;
-                        }
-                        if(in_array($key,$whole)||in_array($prize_arr[$key-1]['pid'],$whole)){
-                            if($prize_arr[$key-1]['multiple_rate']>10&&count($whole)==8){
-                                $arr[$key]=100;
-                            }else if(count($whole)<8){
-                                $arr[$key]=100;
-                            }
-                        }else{
-                            $arr[$key]=0;
-                        }
-                    }
-                }
-                if($this->whole()==0){
-                    foreach ($arr as $key=>$item){
-                        if(in_array($key,$whole) || $key==10 || $key==22 || $item==0){
-                            $arr[$key]=0;
-                        }else if($prize_arr[$key-1]['multiple_rate']<10){
-                            $arr[$key]=100;
-                        }else{
-                            $arr[$key]=0;
-                        }
-                    }
-                }
+            foreach ($param['fruits'] as $item){
+                $whole[] = $item[0];
+            }
 
-                $rid = $this->get_rand($arr); //根据概率获取奖项id
-                $yes = $prize_arr[$rid-1]; //中奖项
-                if($rid==10||$rid==22){
-                    $yes['luck']=true;
-                    $data['data']=$this->luck($rid);
-                    foreach ($param['fruits'] as $key=>$value){
-                        foreach ($data['data']['pos']['luck'] as $zhon){
-                            if($prize_arr[$zhon-1]['pid']==$prize_arr[$value[0]-1]['pid']){
-                                $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
-                            }else if($prize_arr[$zhon-1]['pid']==$prize_arr[$value[0]-1]['game_id']){
-                                $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
-                            }else if($prize_arr[$zhon-1]['game_id']==$prize_arr[$value[0]-1]['game_id']){
-                                $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
-                            }
-                        }
+            if (empty($param)) {
+                $this->error("没有参数！请传递参数");
+            }
 
+            distribution($param['money']);
+            $prize_arr = db('game')->select(); // 查询水果中奖概率
+            $user_info = $this->user_in();
+
+            if($user_info['is_thumb']==1){
+                $prize=Db::name("user_luck")
+                    ->field('luck_sel')
+                    ->where("user_id",$user_info['id'])
+                    ->find();
+
+                $ar['1'] = 100 - $prize['luck_sel']; //未中
+                $ar['2'] = $prize['luck_sel']; //中
+                $rid = $this->get_rand($ar);
+
+                if($rid==1){
+                    foreach ($prize_arr as $key=>$item){
+                        if($item['game_id']==10||$item['game_id']==22){
+                            $prize_arr[$key]['v']=0;
+                        }
                     }
                 }else{
-                    //没有选中LUCK时执行
-                    $yes['luck']=false;
-                    $data['data']=array("type"=>0,"luck_name"=>$prize_arr[$rid-1]['prize'],"pos"=>$yes['game_id']);
-                    foreach ($param['fruits'] as $key=>$value){
-                        if($value[0]==$rid){
-                            $data['money'][]=$prize_arr[$rid-1]['multiple_rate']*$value[1];
-                        }else if ($prize_arr[$rid-1]['pid']==$value[0]){
-                            $data['money'][]=$prize_arr[$rid-1]['multiple_rate']*$value[1];
+                    foreach ($prize_arr as $key=>$item){
+                        if($item['game_id']==10||$item['game_id']==22){
+                            $prize_arr[$key]['v']=$prize['luck_sel']/2;
                         }else{
-                            $data['money'][]=0;
+                            $prize_arr[$key]['v']=0;
                         }
                     }
                 }
+            } // 判断LUCK抽中概率
 
-                // 判断 'money' 是否存在，如果没有则赋值为0
-                !isset($data['money'])?$data['money'][]=0:'';
-                $in_money=array_sum($data['money']);
-                $money=$param['money'];
-                $profit=$in_money-$money;
-                $new_balance = db("user")->where("id", session("user_info.id"))->value("balance") + $in_money;
-                // 如果新余额小于 0，则设置为 0
-                if ($new_balance < 0) {
-                    $new_balance = 0;
+            foreach ($prize_arr as $item){
+                if(in_array($item['game_id'],$whole) || $item['game_id']==10 || $item['game_id']==22){
+                    $arr[$item['game_id']] = $item['v']*($this->whole()); // 概率数组
+                }else{
+                    $arr[$item['game_id']] = $item['v']*(100-$this->whole()); // 概率数组
                 }
-                // 更新余额
-                db("user")->where("id", session("user_info.id"))->update(['balance' => $new_balance]);
-                $this->game_log($profit,$money,$in_money,session('user_info.id'));
-                return $this->success('成功','',$data);
             }
+
+            if($this->whole()==100){
+                foreach ($arr as $key=>$item){
+                    if($key==5){
+                        $arr[$key]=0;
+                    }
+                    if(in_array($key,$whole)||in_array($prize_arr[$key-1]['pid'],$whole)){
+                        if($prize_arr[$key-1]['multiple_rate']>10&&count($whole)==8){
+                            $arr[$key]=100;
+                        }else if(count($whole)<8){
+                            $arr[$key]=100;
+                        }
+                    }else{
+                        $arr[$key]=0;
+                    }
+                }
+            }
+            if($this->whole()==0){
+                foreach ($arr as $key=>$item){
+                    if(in_array($key,$whole) || $key==10 || $key==22 || $item==0){
+                        $arr[$key]=0;
+                    }else if($prize_arr[$key-1]['multiple_rate']<10){
+                        $arr[$key]=100;
+                    }else{
+                        $arr[$key]=0;
+                    }
+                }
+            }
+
+            $rid = $this->get_rand($arr); //根据概率获取奖项id
+            $yes = $prize_arr[$rid-1]; //中奖项
+            if($rid==10||$rid==22){
+                $yes['luck']=true;
+                $data['data']=$this->luck($rid);
+                foreach ($param['fruits'] as $key=>$value){
+                    foreach ($data['data']['pos']['luck'] as $zhon){
+                        if($prize_arr[$zhon-1]['pid']==$prize_arr[$value[0]-1]['pid']){
+                            $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
+                        }else if($prize_arr[$zhon-1]['pid']==$prize_arr[$value[0]-1]['game_id']){
+                            $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
+                        }else if($prize_arr[$zhon-1]['game_id']==$prize_arr[$value[0]-1]['game_id']){
+                            $data['money'][]=$prize_arr[$zhon-1]['multiple_rate']*$value[1];
+                        }
+                    }
+
+                }
+            }else{
+                //没有选中LUCK时执行
+                $yes['luck']=false;
+                $data['data']=array("type"=>0,"luck_name"=>$prize_arr[$rid-1]['prize'],"pos"=>$yes['game_id']);
+                foreach ($param['fruits'] as $key=>$value){
+                    if($value[0]==$rid){
+                        $data['money'][]=$prize_arr[$rid-1]['multiple_rate']*$value[1];
+                    }else if ($prize_arr[$rid-1]['pid']==$value[0]){
+                        $data['money'][]=$prize_arr[$rid-1]['multiple_rate']*$value[1];
+                    }else{
+                        $data['money'][]=0;
+                    }
+                }
+            }
+
+            // 判断 'money' 是否存在，如果没有则赋值为0
+            if (!isset($data['money'])) {
+                $this->error('请求失败，请稍后再试！', '', false);
+            }
+            $userModel = new \app\common\model\User();
+
+            $in_money = array_sum($data['money']);
+            $money = $param['money'];
+            $profit = $in_money - $money;
+            $new_balance = $userModel
+                ->where("id", session("user_info.id"))
+                ->value("balance") + $profit;
+
+            // 如果新余额小于 0，则设置为 0
+            if ($new_balance < 0) {
+                $new_balance = 0;
+            }
+
+            // 更新余额
+            $updateBalance = $userModel->save(['balance' => $new_balance], ['id' => session("user_info.id")]);
+            if (!$updateBalance) {
+                $this->error("请求失败，请稍后再试！", '', $new_balance);
+            }
+            $this->game_log($profit,$money,$in_money,session('user_info.id'));
+            $this->success('成功','',$data);
         }
     }
+
     /**
      *抽中luck后在执行此函数
      */
