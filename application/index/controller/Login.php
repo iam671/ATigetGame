@@ -20,7 +20,7 @@ public function login() {
         if (empty($user_info)) {
             return $this->error("用户名不存在！", '', 'false');
         } else {
-            if ($user_info['password'] == md5($param['password'])) {
+            if (password_verify_compat($param['password'], $user_info['password'])) {
                 if ($user_info['status'] == 0) {
                     user_log("登录失败");
                     return $this->error("用户账号已禁止登录！请联系客服", '', 'false');
@@ -79,7 +79,7 @@ public function modify(){
         }else{
             // 移除密保问题判断
             if($modify['answer']==$user_info['answer']){
-                db("user")->where('id',$user_info['id'])->update(['password'=>md5($modify['password'])]);
+                db("user")->where('id',$user_info['id'])->update(['password'=>password_hash_compat($modify['password'])]);
                 user_log("修改密码");
                 return $this->success("密码修改成功",'','true');
             }else{
@@ -144,7 +144,7 @@ public function modify(){
             // 构建用户数据
             $data = array([
                 'username' => $param['username'],   // 用户名
-                'password' => md5($param['password']),   // 密码
+                'password' => password_hash_compat($param['password']),   // 密码
                 'secret_security' => "你的微信是多少?",  // 密保问题
                 'mobile' => iphone(),  // 获取手机型号
                 'answer' => $param['answer'],  // 密保问题答案
@@ -212,12 +212,12 @@ public function modify(){
             $modify=$this->request->param();
             $user = session("user_info.id");
             $user_info=db("user")->where('id',$user)->find();
-            if(md5($modify["j_pwd"])==$user_info["password"]){
+            if(password_verify_compat($modify["j_pwd"], $user_info["password"])){
                 if($modify["j_pwd"]==$modify["x_pwd"]){
                     $this->error("旧密码和新密码不能相同！",'',false);
                 }else{
-                    db("user")->where("id",$user_info['id'])->update(array("password"=>md5($modify["x_pwd"])));
-                    session("user_info.password",$modify["x_pwd"]);
+                    db("user")->where("id",$user_info['id'])->update(array("password"=>password_hash_compat($modify["x_pwd"])));
+                    session("user_info.password", password_hash_compat($modify["x_pwd"]));
                     $this->success("密码修改成功",'',true);
                 }
             }else{

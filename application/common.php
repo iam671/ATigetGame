@@ -66,6 +66,57 @@ if (!function_exists('iphone')) {
 	}
 }
 
+if (!function_exists('password_hash_compat')) {
+	function password_hash_compat($value)
+	{
+		return password_hash((string) $value, PASSWORD_DEFAULT);
+	}
+}
+
+if (!function_exists('password_verify_compat')) {
+	function password_verify_compat($value, $hash)
+	{
+		$hash = (string) $hash;
+		if ($hash === '') {
+			return false;
+		}
+
+		if (password_get_info($hash)['algo'] !== 0) {
+			return password_verify((string) $value, $hash);
+		}
+
+		return md5((string) $value) === $hash;
+	}
+}
+
+if (!function_exists('stored_value_encode')) {
+	function stored_value_encode($value)
+	{
+		return json_encode($value, JSON_UNESCAPED_UNICODE);
+	}
+}
+
+if (!function_exists('stored_value_decode')) {
+	function stored_value_decode($value)
+	{
+		if ($value === null || $value === '') {
+			return [];
+		}
+
+		$decoded = json_decode($value, true);
+		if (json_last_error() === JSON_ERROR_NONE) {
+			return $decoded;
+		}
+
+		$decoded = @unserialize($value);
+		if ($decoded !== false || $value === 'b:0;') {
+			return $decoded;
+		}
+
+		return $value;
+	}
+}
+
 if (!function_exists('user_log')) {
 	function user_log($remark = '')
 	{

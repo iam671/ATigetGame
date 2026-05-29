@@ -64,7 +64,7 @@ class User extends AdminBase
             if (empty($param['password'])) {
                 unset($param['password']);
             }else{
-                $param['password']=md5($param['password']);
+                $param['password']=password_hash_compat($param['password']);
             }
             $user_id=$param['id'];
             unset($param['id']);

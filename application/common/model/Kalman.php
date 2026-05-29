@@ -17,12 +17,12 @@ class Kalman extends Model
 
     public function setPhotoAttr($value)
     {
-        return serialize($value);
+        return stored_value_encode($value);
     }
 
     public function getPhotoAttr($value)
     {
-        return unserialize($value);
+        return stored_value_decode($value);
     }
 
     public function setContentAttr($value)

@@ -21,7 +21,6 @@ class Index extends AdminBase
     }
     public function index()
     {
-        // 快捷方式
        $this->login();
     }
 
@@ -34,11 +33,8 @@ class Index extends AdminBase
             if ($result !== true) {
                 $this->error($result);
             }
-            $admin = model('admin')->where([
-                'username' => $param['username'],
-                'password' => md5($param['password'])
-            ])->find();
-            if ($admin) {
+            $admin = model('admin')->where('username', $param['username'])->find();
+            if ($admin && password_verify_compat($param['password'], $admin['password'])) {
                 $admin['status'] != 1 && $this->error('账号已禁用');
                 // 保存状态
                 $auth = [
@@ -97,10 +93,10 @@ class Index extends AdminBase
             empty($param['password']) && $this->error('请输入旧密码');
             empty($param['new_password']) && $this->error('请输入新密码');
             empty($param['rep_password']) && $this->error('请输入确认密码');
-            !check_password($param['new_password'], 6, 16) && $this->error('请输入6-16位的密码');
+            (strlen($param['new_password']) < 6 || strlen($param['new_password']) > 16) && $this->error('请输入6-16位的密码');
             $param['new_password'] != $param['rep_password'] && $this->error('两次密码不一致');
             $admin = model('admin')->where('id', session('admin_auth.admin_id'))->find();
-            $admin['password'] != md5($param['password']) && $this->error('旧密码错误');
+            !password_verify_compat($param['password'], $admin['password']) && $this->error('旧密码错误');
             $data = ['id' => session('admin_auth.admin_id'), 'password' => $param['new_password']];
             if ($this->update('admin', $data, false) === true) {
                 insert_admin_log('修改了登录密码');

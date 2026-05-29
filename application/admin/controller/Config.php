@@ -117,25 +117,25 @@ class Config extends AdminBase
     public function upload()
     {
         if ($this->request->isPost()) {
-            model('system')->save(['value' => serialize($this->request->param())], ['name' => 'upload_image']);
+            model('system')->save(['value' => stored_value_encode($this->request->param())], ['name' => 'upload_image']);
             clear_cache();
             insert_admin_log('修改了上传设置');
             $this->success('保存成功');
         }
         $data = model('system')->where('name', 'upload_image')->find();
-        return $this->fetch('upload', ['data' => unserialize($data['value'])]);
+        return $this->fetch('upload', ['data' => stored_value_decode($data['value'])]);
     }
 
     public function email()
     {
         if ($this->request->isPost()) {
-            model('system')->save(['value' => serialize($this->request->param())], ['name' => 'email_server']);
+            model('system')->save(['value' => stored_value_encode($this->request->param())], ['name' => 'email_server']);
             clear_cache();
             insert_admin_log('修改了邮件设置');
             $this->success('保存成功');
         }
         $data = model('system')->where('name', 'email_server')->find();
-        return $this->fetch('email', ['data' => unserialize($data['value'])]);
+        return $this->fetch('email', ['data' => stored_value_decode($data['value'])]);
     }
 
     // 测试发送

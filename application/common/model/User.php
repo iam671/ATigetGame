@@ -10,6 +10,6 @@ class User extends Model
 
     public function setPasswordAttr($value)
     {
-        return md5($value);
+        return password_hash_compat($value);
     }
 }
