@@ -41,6 +41,11 @@ class Game extends Base
             if (empty($param)) {
                 $this->error("没有参数！请传递参数");
             }
+            $userModel = new \app\common\model\User();
+            $balance = $userModel->where("id", session("user_info.id"))->value("balance");
+            if ($balance < $param['money']) {
+                $this->error("余额不足！", '', false);
+            }
 
             distribution($param['money']);
             $prize_arr = db('game')->select(); // 查询水果中奖概率
@@ -143,16 +148,13 @@ class Game extends Base
 
             // 判断 'money' 是否存在，如果没有则赋值为0
             if (!isset($data['money'])) {
-                $this->error('请求失败，请稍后再试！', '', false);
+                $data['money'][] = 0;
             }
-            $userModel = new \app\common\model\User();
 
             $in_money = array_sum($data['money']);
             $money = $param['money'];
             $profit = $in_money - $money;
-            $new_balance = $userModel
-                ->where("id", session("user_info.id"))
-                ->value("balance") + $profit;
+            $new_balance = $balance + $profit;
 
             // 如果新余额小于 0，则设置为 0
             if ($new_balance < 0) {
@@ -162,7 +164,7 @@ class Game extends Base
             // 更新余额
             $updateBalance = $userModel->save(['balance' => $new_balance], ['id' => session("user_info.id")]);
             if (!$updateBalance) {
-                $this->error("请求失败，请稍后再试！", '', $new_balance);
+                $this->error("网络请求失败，请重试！", '', $new_balance);
             }
             $this->game_log($profit,$money,$in_money,session('user_info.id'));
             $this->success('成功','',$data);

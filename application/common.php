@@ -418,3 +418,86 @@ if (!function_exists('to_under_score')) {
 		return strtolower($value);
 	}
 }
+
+if (!function_exists('clear_cache')) {
+    function clear_cache()
+    {
+        // runtime 目录（根据项目结构调整）
+        $runtime = realpath(__DIR__ . '/../runtime');
+        if ($runtime === false) {
+            return false;
+        }
+
+        // 要清理的子目录列表（可根据需要增减）
+        $targets = ['cache', 'temp', 'log', 'session', 'view', 'tpl', 'compile'];
+
+        $deleteDirContents = function ($dir) {
+            if (!is_dir($dir)) {
+                return;
+            }
+            $items = new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS);
+            foreach ($items as $item) {
+                $path = $item->getRealPath();
+                if ($item->isDir()) {
+                    // 递归删除子目录
+                    $thisDir = $path;
+                    $subIter = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($thisDir, \FilesystemIterator::SKIP_DOTS),
+                        \RecursiveIteratorIterator::CHILD_FIRST
+                    );
+                    foreach ($subIter as $sub) {
+                        if ($sub->isDir()) {
+                            @rmdir($sub->getRealPath());
+                        } else {
+                            @unlink($sub->getRealPath());
+                        }
+                    }
+                    // 最后尝试删除该子目录本身
+                    @rmdir($thisDir);
+                } else {
+                    @unlink($path);
+                }
+            }
+        };
+
+        foreach ($targets as $t) {
+            $path = $runtime . DIRECTORY_SEPARATOR . $t;
+            // 如果目录存在且不是 runtime 根，清理其内容（保留目录本身）
+            if (is_dir($path)) {
+                // 清空目录内容 but 保留目录
+                $inner = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
+                foreach ($inner as $it) {
+                    $real = $it->getRealPath();
+                    if ($it->isDir()) {
+                        // 递归删除子目录及其内容
+                        $subIter = new \RecursiveIteratorIterator(
+                            new \RecursiveDirectoryIterator($real, \FilesystemIterator::SKIP_DOTS),
+                            \RecursiveIteratorIterator::CHILD_FIRST
+                        );
+                        foreach ($subIter as $sub) {
+                            if ($sub->isDir()) {
+                                @rmdir($sub->getRealPath());
+                            } else {
+                                @unlink($sub->getRealPath());
+                            }
+                        }
+                        @rmdir($real);
+                    } else {
+                        @unlink($real);
+                    }
+                }
+            }
+        }
+
+        // 如果 ThinkPHP 的 Cache 类可用，尝试清理框架缓存
+        if (class_exists('\think\Cache')) {
+            try {
+                \think\Cache::clear();
+            } catch (\Throwable $e) {
+                // 忽略清理时的异常，继续返回
+            }
+        }
+
+        return true;
+    }
+}
